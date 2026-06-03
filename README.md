@@ -175,6 +175,7 @@ model AiChat {
 }
 ```
 ## API 设计
+```text
 所有 API 路径前缀 /api/v1，返回 JSON。需要认证的接口在请求头携带 Authorization: Bearer <token>。
 
 1. 认证模块 /auth
@@ -221,3 +222,4 @@ DELETE	/ai/history/:id	删除某次对话	是
 
 13. 文件上传 /upload （需认证）
 POST	/upload	上传图片/文件，返回 URL	是
+```
