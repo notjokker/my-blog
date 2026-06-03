@@ -16,23 +16,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 文章存放目录
 const postsDir = path.join(__dirname, 'posts');
 
-// 3. 辅助函数：获取所有文章的基本信息（用于列表页）
-function getPosts() {
-  // 读取 posts 文件夹下的所有 .md 文件
-  const files = fs.readdirSync(postsDir).filter(file => file.endsWith('.md'));
-
-  const posts = files.map(file => {
-    const content = fs.readFileSync(path.join(postsDir, file), 'utf-8');
-    // 使用 gray-matter 只提取元数据（标题、日期等），不解析全文，提高效率
-    const { data } = matter(content);
-    return {
-      slug: file.replace('.md', ''),        // 文件名去掉 .md 作为文章的唯一标识
-      title: data.title || '无标题',
-      date: data.date || new Date().toISOString().slice(0, 10),
-      tags: data.tags || [],
-      excerpt: data.excerpt || ''
-    };
-  });
+function getPosts(dir = postsDir)
+{
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  let posts = [];
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      posts = posts.concat(getPosts(fullPath)); // 递归
+    } else if (entry.name.endsWith('.md')) {
+      const content = fs.readFileSync(fullPath, 'utf-8');
+      const { data } = matter(content);
+      // slug 需要包含相对 posts 的路径（去掉 .md）
+      const relativePath = path.relative(postsDir, fullPath);
+      const slug = relativePath.replace(/\.md$/, '').replace(/\\/g, '/');
+      posts.push({
+        slug,
+        title: data.title || '无标题',
+        date: data.date || new Date().toISOString().slice(0, 10),
+        tags: data.tags || [],
+        excerpt: data.excerpt || ''
+      });
+    }
+  }
+  posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return posts;
+}//功能升级：能够读取子文件下的md文件
 
   // 按日期降序排列（最新的文章在最前面）
   posts.sort((a, b) => new Date(b.date) - new Date(a.date));
