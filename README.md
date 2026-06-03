@@ -8,7 +8,7 @@
 总而言之，统而言之，欢迎光临，欢迎回家。
 ## 预期项目架构
 ```text
-blog-server/
+my-blog/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── package.json
