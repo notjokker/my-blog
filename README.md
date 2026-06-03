@@ -216,10 +216,10 @@ DELETE	/subscriptions/:id	取消订阅
 GET	/subscriptions/feed	获取我订阅的内容更新
 
 12. AI 助手 /ai （需认证）
-POST	/ai/chat	发送消息，返回 AI 回复	是
-GET	/ai/history	获取当前用户的对话历史	是
-DELETE	/ai/history/:id	删除某次对话	是
+POST	/ai/chat	发送消息，返回 AI 回复	
+GET	/ai/history	获取当前用户的对话历史	
+DELETE	/ai/history/:id	删除某次对话	
 
 13. 文件上传 /upload （需认证）
-POST	/upload	上传图片/文件，返回 URL	是
+POST	/upload	上传图片/文件，返回 URL	
 ```
