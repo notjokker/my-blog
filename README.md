@@ -71,16 +71,12 @@ my-blog
 
 ## 本地运行
 
-安装依赖：
-
-```bash
-npm install
-```
 
 启动项目：
 
-```bash
-npm start
+```text
+cd ~/my-blog
+node app.js
 ```
 
 默认访问：
