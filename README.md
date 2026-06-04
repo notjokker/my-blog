@@ -14,8 +14,9 @@ my-blog/
 ├── package.json
 ├── tsconfig.json
 ├── .env.example
-├── prisma/
-│   ├── schema.prisma
+|—— view
+├── prisma/                      #数据源
+│   ├── schema.prisma            #数据源定义
 │   └── migrations/
 ├── src/
 │   ├── index.ts                 # 入口
