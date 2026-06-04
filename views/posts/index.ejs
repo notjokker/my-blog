@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>我的博客</title><style>body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; } .post { border-bottom: 1px solid #ccc; padding: 10px 0; } a { text-decoration: none; color: #0366d6; }</style></head>
+<body>
+  <h1>博客文章</h1>
+  <% if (posts.length === 0) { %><p>暂无文章。</p><% } else { %>
+    <% posts.forEach(post => { %>
+      <div class="post">
+        <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+        <p><small>作者: <%= post.author?.name || '匿名' %> | <%= post.createdAt.toDateString() %></small></p>
+      </div>
+    <% }) %>
+  <% } %>
+</body>
+</html>

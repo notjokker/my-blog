@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head><title><%= post.title %></title><style>body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; } a { text-decoration: none; color: #0366d6; }</style></head>
+<body>
+  <h1><%= post.title %></h1>
+  <p><small>作者: <%= post.author?.name || '匿名' %> | <%= post.createdAt.toDateString() %></small></p>
+  <div><%- post.content %></div>
+  <a href="/posts">← 返回列表</a>
+</body>
+</html>
