@@ -1,10 +1,151 @@
-<!DOCTYPE html>
-<html>
-<head><title><%= post.title %></title><style>body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; } a { text-decoration: none; color: #0366d6; }</style></head>
-<body>
-  <h1><%= post.title %></h1>
-  <p><small>作者: <%= post.author?.name || '匿名' %> | <%= post.createdAt.toDateString() %></small></p>
-  <div><%- post.content %></div>
-  <a href="/posts">← 返回列表</a>
-</body>
-</html>
+<%- include('../partials/header') %>
+<h1><%= post.title %></h1>
+<p><small>作者: <%= post.author?.name || '匿名' %> | 分类: <%= post.category?.name || '未分类' %> | <%= post.createdAt.toDateString() %></small></p>
+
+<!-- 编辑/删除按钮，仅作者可见 -->
+<div id="post-actions" style="margin-bottom:10px; display:none;">
+  <a href="/posts/edit/<%= post.id %>" class="btn-edit">编辑</a>
+  <button onclick="deletePost()" class="btn-delete">删除</button>
+</div>
+
+<div><%- post.content %></div>
+<hr>
+
+<p>
+  <button id="like-btn" data-post-id="<%= post.id %>">❤️ <span id="like-count">0</span></button>
+</p>
+
+<h3>评论</h3>
+<div id="comments-list">加载中...</div>
+<hr>
+<div id="comment-form" style="display:none;">
+  <textarea id="comment-input" placeholder="写下你的评论..." rows="3" style="width:100%"></textarea>
+  <button id="comment-submit">发表评论</button>
+</div>
+<p id="login-prompt">请先 <a href="/auth/login">登录</a> 后发表评论。</p>
+
+<style>
+  .btn-edit { padding: 5px 10px; background: #4CAF50; color: white; text-decoration: none; border-radius: 3px; }
+  .btn-delete { padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; }
+</style>
+
+<script>
+(function() {
+  var postId = <%= post.id %>;
+  var token = localStorage.getItem('token');
+
+  // 检查当前用户是否是文章作者，显示编辑/删除按钮
+  if (token) {
+    fetch('/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(user) {
+      if (user.id === <%= post.authorId %>) {
+        document.getElementById('post-actions').style.display = 'block';
+      }
+    })
+    .catch(function() {});
+  }
+
+  // 删除文章
+  window.deletePost = async function() {
+    if (!confirm('确定要删除这篇文章吗？')) return;
+    var res = await fetch('/posts/' + postId, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+      alert('删除成功');
+      window.location.href = '/posts';
+    } else {
+      var err = await res.json();
+      alert(err.error || '删除失败');
+    }
+  };
+
+  // 点赞
+  async function loadLikeCount() {
+    var res = await fetch('/api/posts/' + postId + '/likes');
+    var data = await res.json();
+    document.getElementById('like-count').textContent = data.count;
+  }
+
+  document.getElementById('like-btn').addEventListener('click', async function() {
+    if (!token) { alert('请先登录'); return; }
+    try {
+      var res = await fetch('/api/posts/' + postId + '/like', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (res.ok) {
+        loadLikeCount();
+        document.getElementById('like-btn').style.color = 'red';
+      } else {
+        var err = await res.json();
+        alert(err.error || '点赞失败');
+      }
+    } catch (e) {
+      alert('网络错误');
+    }
+  });
+
+  // 评论列表
+  async function loadComments() {
+    var res = await fetch('/api/posts/' + postId + '/comments');
+    var comments = await res.json();
+    var list = document.getElementById('comments-list');
+    if (comments.length === 0) {
+      list.innerHTML = '<p>暂无评论，来发表第一条吧！</p>';
+      return;
+    }
+    list.innerHTML = comments.map(function(c) {
+      return '<div style="border-bottom:1px solid #eee; padding:5px 0;">' +
+        '<strong>' + (c.user.name || c.user.email) + '</strong> ' +
+        '<span style="color:#666; font-size:0.9em;">' + new Date(c.createdAt).toLocaleString() + '</span>' +
+        '<p>' + c.content.replace(/</g, '&lt;') + '</p>' +
+        '</div>';
+    }).join('');
+  }
+
+  // 评论框显示控制
+  var commentForm = document.getElementById('comment-form');
+  var loginPrompt = document.getElementById('login-prompt');
+  if (token) {
+    commentForm.style.display = 'block';
+    loginPrompt.style.display = 'none';
+  } else {
+    commentForm.style.display = 'none';
+    loginPrompt.style.display = 'block';
+  }
+
+  // 提交评论
+  document.getElementById('comment-submit').addEventListener('click', async function() {
+    if (!token) { alert('请先登录'); return; }
+    var content = document.getElementById('comment-input').value.trim();
+    if (!content) return;
+    try {
+      var res = await fetch('/api/posts/' + postId + '/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ content: content })
+      });
+      if (res.ok) {
+        document.getElementById('comment-input').value = '';
+        loadComments();
+      } else {
+        var err = await res.json();
+        alert(err.error || '评论失败');
+      }
+    } catch (e) {
+      alert('网络错误');
+    }
+  });
+
+  loadLikeCount();
+  loadComments();
+})();
+</script>

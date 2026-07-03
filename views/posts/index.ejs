@@ -1,15 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head><title>我的博客</title><style>body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; } .post { border-bottom: 1px solid #ccc; padding: 10px 0; } a { text-decoration: none; color: #0366d6; }</style></head>
-<body>
-  <h1>博客文章</h1>
-  <% if (posts.length === 0) { %><p>暂无文章。</p><% } else { %>
-    <% posts.forEach(post => { %>
-      <div class="post">
-        <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
-        <p><small>作者: <%= post.author?.name || '匿名' %> | <%= post.createdAt.toDateString() %></small></p>
-      </div>
-    <% }) %>
-  <% } %>
-</body>
-</html>
+<%- include('../partials/header') %>
+<h1>博客文章</h1>
+
+<!-- 分类筛选 -->
+<p>
+  分类：
+  <a href="/posts">全部</a>
+  <% categories.forEach(cat => { %>
+    | <a href="/posts?category=<%= cat.id %>"><%= cat.name %></a>
+  <% }) %>
+</p>
+
+<% if (posts.length === 0) { %>
+  <p>暂无文章。</p>
+<% } else { %>
+  <% posts.forEach(post => { %>
+    <div class="post" style="background:white; padding:15px; margin-bottom:15px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+      <p><small>作者: <%= post.author?.name || '匿名' %> | 分类: <%= post.category?.name || '未分类' %> | <%= post.createdAt.toDateString() %></small></p>
+      <p><span class="like-count" data-post-id="<%= post.id %>">❤️ <span id="count-<%= post.id %>">0</span></span></p>
+    </div>
+  <% }) %>
+<% } %>
+<script>
+  document.querySelectorAll('.like-count').forEach(el => {
+    const postId = el.dataset.postId;
+    fetch(`/api/posts/${postId}/likes`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('count-' + postId).textContent = data.count;
+      });
+  });
+</script>
