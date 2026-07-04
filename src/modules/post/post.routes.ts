@@ -6,9 +6,7 @@ import { marked } from 'marked';
 const prisma = new PrismaClient();
 const router = Router();
 
-// 文章 CRUD 
-
-// 列表（可按分类筛选，公开）
+// 文章列表（可按分类筛选，公开）
 router.get('/', async (req: Request, res: Response) => {
   const { category } = req.query;
   const where: any = { published: true };
@@ -20,10 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
     include: { author: true, category: true },
   });
 
-  // 获取所有分类供导航
   const categories = await prisma.category.findMany();
-
-  // 禁用缓存
   res.set('Cache-Control', 'no-store');
   res.render('posts/index', { posts, categories, currentCategory: Number(category) || null });
 });
@@ -33,9 +28,11 @@ router.get('/new', (_req: Request, res: Response) => {
   res.render('posts/edit', { post: null, categories: [] });
 });
 
-// 编辑文章页面（公开，权限在 API 控制）
+// 编辑文章页面（公开，权限在API控制）
 router.get('/edit/:id', async (req: Request, res: Response) => {
-  const post = await prisma.post.findUnique({ where: { id: Number(req.params.id) } });
+  const postId = Number(req.params.id);
+  if (isNaN(postId)) return res.status(400).send('无效的文章ID');
+  const post = await prisma.post.findUnique({ where: { id: postId } });
   if (!post) return res.status(404).send('文章不存在');
   const categories = await prisma.category.findMany();
   res.render('posts/edit', { post, categories });
@@ -43,9 +40,12 @@ router.get('/edit/:id', async (req: Request, res: Response) => {
 
 // 文章详情（公开）
 router.get('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const postId = Number(req.params.id);
+  if (isNaN(postId) || postId < 1) {
+    return res.status(400).send('无效的文章ID');
+  }
   const post = await prisma.post.findUnique({
-    where: { id: Number(id) },
+    where: { id: postId },
     include: { author: true, category: true },
   });
   if (!post) return res.status(404).send('文章未找到');
@@ -71,13 +71,14 @@ router.post('/', authenticate, async (req: any, res: Response) => {
 
 // 更新文章（需登录，且是作者）
 router.put('/:id', authenticate, async (req: any, res: Response) => {
-  const { id } = req.params;
+  const postId = Number(req.params.id);
+  if (isNaN(postId)) return res.status(400).json({ error: '无效的文章ID' });
   const { title, content, categoryId } = req.body;
-  const post = await prisma.post.findUnique({ where: { id: Number(id) } });
+  const post = await prisma.post.findUnique({ where: { id: postId } });
   if (!post) return res.status(404).json({ error: '文章不存在' });
   if (post.authorId !== req.user.id) return res.status(403).json({ error: '无权限' });
   const updated = await prisma.post.update({
-    where: { id: Number(id) },
+    where: { id: postId },
     data: {
       title,
       content,
@@ -89,15 +90,14 @@ router.put('/:id', authenticate, async (req: any, res: Response) => {
 
 // 删除文章（需登录，且是作者）
 router.delete('/:id', authenticate, async (req: any, res: Response) => {
-  const { id } = req.params;
-  const post = await prisma.post.findUnique({ where: { id: Number(id) } });
+  const postId = Number(req.params.id);
+  if (isNaN(postId)) return res.status(400).json({ error: '无效的文章ID' });
+  const post = await prisma.post.findUnique({ where: { id: postId } });
   if (!post) return res.status(404).json({ error: '文章不存在' });
   if (post.authorId !== req.user.id) return res.status(403).json({ error: '无权限' });
-  await prisma.post.delete({ where: { id: Number(id) } });
+  await prisma.post.delete({ where: { id: postId } });
   res.json({ message: '删除成功' });
 });
-
-// 分类管理 API
 
 // 获取所有分类（公开）
 router.get('/categories/all', async (_req: Request, res: Response) => {
@@ -105,7 +105,7 @@ router.get('/categories/all', async (_req: Request, res: Response) => {
   res.json(categories);
 });
 
-// 创建分类（需登录，可限制管理员）
+// 创建分类（需登录）
 router.post('/categories', authenticate, async (req: any, res: Response) => {
   const { name } = req.body;
   if (!name) return res.status(400).json({ error: '分类名不能为空' });
@@ -119,9 +119,10 @@ router.post('/categories', authenticate, async (req: any, res: Response) => {
 
 // 删除分类（需登录）
 router.delete('/categories/:id', authenticate, async (req: any, res: Response) => {
-  const id = Number(req.params.id);
+  const catId = Number(req.params.id);
+  if (isNaN(catId)) return res.status(400).json({ error: '无效的分类ID' });
   try {
-    await prisma.category.delete({ where: { id } });
+    await prisma.category.delete({ where: { id: catId } });
     res.json({ message: '分类已删除' });
   } catch (err) {
     res.status(400).json({ error: '删除失败，可能分类不存在或仍有文章' });
