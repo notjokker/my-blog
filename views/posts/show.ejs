@@ -1,30 +1,33 @@
 <%- include('../partials/header') %>
 <div class="container">
   <h1><%= post.title %></h1>
-  <p><small>✍️ <%= post.author?.name || '匿名' %> · 🗂️ <%= post.category?.name || '未分类' %> · 📅 <%= post.createdAt.toDateString() %></small></p>
-  
-  <div id="post-actions" style="margin-bottom:10px; display:none;">
+  <p class="meta" style="color: var(--text-secondary);">
+    ✍️ <%= post.author?.name || '匿名' %> · 🗂️ <%= post.category?.name || '未分类' %> · 📅 <%= post.createdAt.toDateString() %>
+  </p>
+
+  <div id="post-actions" style="margin: 16px 0; display:none;">
     <a href="/posts/edit/<%= post.id %>" class="btn btn-edit">编辑</a>
-    <button onclick="deletePost()" class="btn-delete" style="margin-left:10px;">删除</button>
+    <button onclick="deletePost()" class="btn btn-delete" style="margin-left:8px;">删除</button>
   </div>
 
-  <div class="card" style="padding:30px; font-size:1.1rem; line-height:1.8;">
+  <div class="card post-content">
     <%- post.content %>
   </div>
 
-  <hr style="margin:20px 0; border-color:rgba(0,0,0,0.1);">
-  <p>
-    <button id="like-btn" data-post-id="<%= post.id %>">❤️ <span id="like-count">0</span></button>
-  </p>
+  <div style="margin-top: 24px;">
+    <button id="like-btn" class="like-btn" data-post-id="<%= post.id %>">
+      ❤️ <span id="like-count">0</span>
+    </button>
+  </div>
 
-  <h3>💬 评论</h3>
-  <div id="comments-list">加载中...</div>
-  <hr style="margin:20px 0; border-color:rgba(0,0,0,0.1);">
+  <h3 style="margin-top: 32px;">💬 评论</h3>
+  <div id="comments-list" style="margin: 16px 0;"></div>
+
   <div id="comment-form" style="display:none;">
     <textarea id="comment-input" placeholder="写下你的评论..." rows="3"></textarea>
-    <button id="comment-submit" style="margin-top:10px;">发表评论</button>
+    <button id="comment-submit" class="btn btn-primary">发表评论</button>
   </div>
-  <p id="login-prompt">请先 <a href="/auth/login">登录</a> 后发表评论。</p>
+  <p id="login-prompt" style="margin-top: 16px;">请先 <a href="/auth/login">登录</a> 后发表评论。</p>
 </div>
 
 <script>
@@ -32,7 +35,6 @@
     var postId = <%= post.id %>;
     var token = localStorage.getItem('token');
 
-    // 作者才能看到编辑/删除
     if (token) {
       fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
         .then(r => r.json())
@@ -55,9 +57,6 @@
       }
     };
 
-    // 点赞和评论（保持原有逻辑，略作样式适配）
-    // ...（此处省略，保留之前完整的点赞/评论代码，你可以把之前的脚本复制过来）
-    // 为了完整性，我把关键部分写在这里：
     async function loadLikeCount() {
       var res = await fetch('/api/posts/' + postId + '/likes');
       var data = await res.json();
@@ -77,14 +76,14 @@
       var comments = await res.json();
       var list = document.getElementById('comments-list');
       if (comments.length === 0) {
-        list.innerHTML = '<p>暂无评论</p>';
+        list.innerHTML = '<p style="color: var(--text-secondary);">暂无评论</p>';
         return;
       }
-      list.innerHTML = comments.map(c => 
-        '<div class="comment-item" style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.5); border-radius:10px;">' +
+      list.innerHTML = comments.map(c =>
+        '<div class="comment-item">' +
         '<strong>' + (c.user.name || c.user.email) + '</strong>' +
-        '<span style="float:right; color:#666; font-size:0.8em;">' + new Date(c.createdAt).toLocaleString() + '</span>' +
-        '<p style="margin-top:5px;">' + c.content.replace(/</g, '&lt;') + '</p>' +
+        '<span style="float:right; font-size:0.85rem; color: var(--text-secondary);">' + new Date(c.createdAt).toLocaleString() + '</span>' +
+        '<p style="margin-top:6px;">' + c.content.replace(/</g, '&lt;') + '</p>' +
         '</div>'
       ).join('');
     }
@@ -93,6 +92,7 @@
       document.getElementById('comment-form').style.display = 'block';
       document.getElementById('login-prompt').style.display = 'none';
     }
+
     document.getElementById('comment-submit').addEventListener('click', async () => {
       var content = document.getElementById('comment-input').value.trim();
       if (!content) return;

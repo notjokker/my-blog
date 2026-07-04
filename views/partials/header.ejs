@@ -1,6 +1,6 @@
 <nav>
   <a href="/" class="brand">✨ My Blog</a>
-  <div>
+  <div class="nav-links">
     <a href="/posts">文章</a>
     <a href="/games/2048.html">2048</a>
     <span id="auth-links">
@@ -15,7 +15,6 @@
   if (token) {
     document.getElementById('auth-links').innerHTML = 
       '<a href="/posts/new">写文章</a>' +
-      '<span style="color:#2d3436; margin-left:10px;">已登录</span>' +
       '<a href="#" onclick="logout()">退出</a>';
   }
   window.logout = function() {

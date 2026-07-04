@@ -1,28 +1,34 @@
 <%- include('../partials/header') %>
 <div class="container">
-  <h1 style="margin-bottom:20px;">📝 博客文章</h1>
-  <!-- 分类筛选 -->
-  <p>
+  <h1 style="margin-bottom: 24px;">博客文章</h1>
+  <p style="margin-bottom: 24px;">
     <a href="/posts">全部</a>
     <% categories.forEach(cat => { %>
-      | <a href="/posts?category=<%= cat.id %>"><%= cat.name %></a>
+      | <a href="/posts?category=<%= cat.id %>" class="category-link"><%= cat.name %></a>
     <% }) %>
   </p>
+
   <% if (posts.length === 0) { %>
-    <p>暂无文章，成为第一个作者吧！</p>
+    <p>暂无文章。</p>
   <% } else { %>
     <% posts.forEach(post => { %>
-      <div class="post">
+      <div class="post-card">
         <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
-        <p><small>✍️ <%= post.author?.name || '匿名' %> · 🗂️ <%= post.category?.name || '未分类' %> · 📅 <%= post.createdAt.toDateString() %></small></p>
-        <p><span class="like-count" data-post-id="<%= post.id %>">❤️ <span id="count-<%= post.id %>">0</span></span></p>
+        <div class="meta">
+          ✍️ <%= post.author?.name || '匿名' %> · 🗂️ <%= post.category?.name || '未分类' %> · 📅 <%= post.createdAt.toDateString() %>
+        </div>
+        <p>
+          <span class="like-btn" data-post-id="<%= post.id %>">
+            ❤️ <span id="count-<%= post.id %>">0</span>
+          </span>
+        </p>
       </div>
     <% }) %>
   <% } %>
 </div>
+
 <script>
-  // 加载点赞数（保持不变）
-  document.querySelectorAll('.like-count').forEach(el => {
+  document.querySelectorAll('.like-btn').forEach(el => {
     const postId = el.dataset.postId;
     fetch(`/api/posts/${postId}/likes`)
       .then(res => res.json())
