@@ -1,15 +1,15 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #faf8ef;   /* 2048 的背景色 */
-  color: #776e65;        /* 2048 的文字色，更协调 */
+  background: #faf8ef;       /* 与2048背景一致 */
+  color: #776e65;
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* 导航栏：比主界面稍深，按钮白色靠右 */
+/* 棕色导航栏 */
 nav {
-  background: #e5dfcf;   /* 比 #faf8ef 深一点的暖灰 */
+  background: #8b5e3c;       /* 暖棕色 */
   color: white;
   padding: 10px 20px;
   margin-bottom: 20px;
@@ -19,57 +19,35 @@ nav {
   border-radius: 5px;
 }
 
-nav .brand {
-  font-weight: bold;
-  color: white;
+nav a, nav span {
+  color: white !important;
   text-decoration: none;
-}
-
-nav .nav-links {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-nav .nav-links a,
-nav .nav-links span {
-  color: white;
-  text-decoration: none;
+  margin-left: 15px;
   font-weight: 500;
 }
 
-nav .nav-links a:hover {
-  text-decoration: underline;
+nav .brand {
+  font-weight: bold;
+  margin-left: 0;
 }
 
-/* 文章卡片样式保持简洁 */
 .post {
   background: white;
-  border-radius: 8px;
-  padding: 20px;
+  padding: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-h1, h2, h3 {
-  color: #776e65;
-}
-
-a {
-  color: #8b7b6b;
-}
-
-/* 按钮样式 */
 button, .btn {
-  background: #8b7b6b;
+  background: #8b5e3c;
   color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 5px;
   cursor: pointer;
-  font-weight: 500;
 }
 
 button:hover {
-  background: #6b5e52;
+  background: #6b4226;
 }
