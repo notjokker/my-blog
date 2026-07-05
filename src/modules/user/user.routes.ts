@@ -5,7 +5,7 @@ import { authenticate } from '../../middleware/auth';
 const prisma = new PrismaClient();
 const router = Router();
 
-// 获取当前登录用户信息（用于个人中心）
+// 获取当前登录用户信息（API，需认证）
 router.get('/me', authenticate, async (req: any, res: Response) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user.id },
@@ -14,7 +14,7 @@ router.get('/me', authenticate, async (req: any, res: Response) => {
   res.json(user);
 });
 
-// 更新个人资料
+// 更新个人资料（API，需认证）
 router.put('/profile', authenticate, async (req: any, res: Response) => {
   const { name, bio, avatar } = req.body;
   try {
@@ -33,13 +33,9 @@ router.put('/profile', authenticate, async (req: any, res: Response) => {
   }
 });
 
-// 渲染个人中心页面
-router.get('/profile', authenticate, async (req: any, res: Response) => {
-  const user = await prisma.user.findUnique({
-    where: { id: req.user.id },
-    select: { id: true, email: true, name: true, avatar: true, bio: true }
-  });
-  res.render('user/profile', { user });
+// 个人中心页面（公开，前端自行验证登录状态）
+router.get('/profile', (_req: Request, res: Response) => {
+  res.render('user/profile');
 });
 
 export default router;

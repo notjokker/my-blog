@@ -74,21 +74,27 @@
     }
   </style>
 </head>
-<nav class="navbar">
-  <a href="/" class="brand">✒️ My Blog</a>
-  <div style="display: flex; align-items: center;">
+
+<nav class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #e5dfcf;">
+  <a href="/" class="brand" style="font-weight: 700; font-size: 1.3rem; color: #333; text-decoration: none;">✒️ My Blog</a>
+  
+  <div class="search-box" style="flex: 1; display: flex; justify-content: center;">
+    <form action="/search" method="GET" style="display: flex; align-items: center; width: 100%; max-width: 400px;">
+      <input type="text" name="q" placeholder="搜索文章..." style="width: 100%; padding: 6px 10px; border: 1px solid #ccc; border-radius: 20px 0 0 20px; outline: none; font-size: 0.9rem;">
+      <button type="submit" style="padding: 6px 15px; background: #8b7b6b; color: white; border: none; border-radius: 0 20px 20px 0; cursor: pointer; font-size: 0.9rem;">搜索</button>
+    </form>
+  </div>
+  
+  <div class="nav-links" style="display: flex; align-items: center;">
     <a href="/posts">文章</a>
     <a href="/games/2048.html">2048</a>
-    <form action="/search" method="GET" style="display: inline-flex; align-items: center; margin-left: 15px;">
-      <input type="text" name="q" placeholder="搜索文章..." style="width: 140px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 5px; font-size: 0.9rem;">
-      <button type="submit" style="padding: 4px 10px; font-size: 0.9rem; background: #8b7b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">搜索</button>
-    </form>
-    <span id="auth-links" style="margin-left: 15px;">
+    <span id="auth-links">
       <a href="/auth/login">登录</a>
       <a href="/auth/register">注册</a>
     </span>
   </div>
 </nav>
+
 <script>
 (function() {
   var token = localStorage.getItem('token');
