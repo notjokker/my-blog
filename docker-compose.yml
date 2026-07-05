@@ -20,6 +20,7 @@ services:
       - ./uploads:/app/uploads   # 文件上传持久化
       - ./src:/app/src           # 开发时可热更新（生产删除）
       - ./dist:/app/dist         # 同步构建产物（可选）
+      - ./uploads:/app/uploads   # 上传图片
     command: ["node", "dist/index.js"]
 
   postgres:

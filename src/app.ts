@@ -7,6 +7,7 @@ import postRoutes from './modules/post/post.routes';
 import likeRoutes from './modules/like/like.routes';
 import commentRoutes from './modules/comment/comment.routes';
 import authRoutes from './modules/auth/auth.routes';
+import uploadRoutes from './modules/upload/upload.routes';
 
 const app = express();
 
@@ -15,9 +16,11 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
-app.use('/docs', express.static(path.join(__dirname, '..', 'public', 'docs'))); //静态部署
+app.use('/docs', express.static(path.join(__dirname, '..', 'public', 'docs'))); 
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use(cors());
 app.use(express.json());
+app.use('/api/upload', uploadRoutes);
 
 // 初始化 passport
 passportConfig(passport);

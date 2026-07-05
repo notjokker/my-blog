@@ -12,14 +12,17 @@ const post_routes_1 = __importDefault(require("./modules/post/post.routes"));
 const like_routes_1 = __importDefault(require("./modules/like/like.routes"));
 const comment_routes_1 = __importDefault(require("./modules/comment/comment.routes"));
 const auth_routes_1 = __importDefault(require("./modules/auth/auth.routes"));
+const upload_routes_1 = __importDefault(require("./modules/upload/upload.routes"));
 const app = (0, express_1.default)();
 // 设置模板引擎
 app.set('view engine', 'ejs');
 app.set('views', path_1.default.join(__dirname, '..', 'views'));
 app.use(express_1.default.static(path_1.default.join(__dirname, '..', 'public')));
-app.use('/docs', express_1.default.static(path_1.default.join(__dirname, '..', 'public', 'docs'))); //静态部署
+app.use('/docs', express_1.default.static(path_1.default.join(__dirname, '..', 'public', 'docs')));
+app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '..', 'uploads')));
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
+app.use('/api/upload', upload_routes_1.default);
 // 初始化 passport
 (0, passport_2.default)(passport_1.default);
 app.use(passport_1.default.initialize());
