@@ -76,21 +76,29 @@
 </head>
 
 <nav class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #e5dfcf;">
-  <a href="/" class="brand" style="font-weight: 700; font-size: 1.3rem; color: #333; text-decoration: none;">✒️ My Blog</a>
+  <!-- 左侧品牌 -->
+  <a href="/" class="brand" style="font-weight: 700; font-size: 1.3rem; color: #333; text-decoration: none; white-space: nowrap;">✒️ My Blog</a>
   
-  <div class="search-box" style="flex: 1; display: flex; justify-content: center;">
+  <!-- 中间搜索框（放大镜图标） -->
+  <div style="flex: 1; display: flex; justify-content: center; margin: 0 20px;">
     <form action="/search" method="GET" style="display: flex; align-items: center; width: 100%; max-width: 400px;">
-      <input type="text" name="q" placeholder="搜索文章..." style="width: 100%; padding: 6px 10px; border: 1px solid #ccc; border-radius: 20px 0 0 20px; outline: none; font-size: 0.9rem;">
-      <button type="submit" style="padding: 6px 15px; background: #8b7b6b; color: white; border: none; border-radius: 0 20px 20px 0; cursor: pointer; font-size: 0.9rem;">搜索</button>
+      <input type="text" name="q" placeholder="搜索文章..." 
+             style="flex: 1; padding: 6px 12px; border: 1px solid #ccc; border-right: none; border-radius: 20px 0 0 20px; outline: none; font-size: 0.9rem;">
+      <button type="submit" 
+              style="padding: 6px 14px; background: #8b7b6b; color: white; border: 1px solid #8b7b6b; border-radius: 0 20px 20px 0; cursor: pointer; font-size: 1rem; line-height: 1; white-space: nowrap;"
+              title="搜索">
+        🔍
+      </button>
     </form>
   </div>
   
-  <div class="nav-links" style="display: flex; align-items: center;">
-    <a href="/posts">文章</a>
-    <a href="/games/2048.html">2048</a>
-    <span id="auth-links">
-      <a href="/auth/login">登录</a>
-      <a href="/auth/register">注册</a>
+  <!-- 右侧导航链接（间距统一） -->
+  <div style="display: flex; align-items: center; gap: 18px;">
+    <a href="/posts" style="color: #333; text-decoration: none; font-weight: 500;">文章</a>
+    <a href="/games/2048.html" style="color: #333; text-decoration: none; font-weight: 500;">2048</a>
+    <span id="auth-links" style="display: flex; align-items: center; gap: 18px;">
+      <a href="/auth/login" style="color: #333; text-decoration: none; font-weight: 500;">登录</a>
+      <a href="/auth/register" style="color: #333; text-decoration: none; font-weight: 500;">注册</a>
     </span>
   </div>
 </nav>
@@ -100,10 +108,11 @@
   var token = localStorage.getItem('token');
   if (token) {
     document.getElementById('auth-links').innerHTML = 
-      '<a href="/user/profile">个人中心</a>' +
-      '<a href="/posts/new">写文章</a>' +
-      '<span style="color: #333; margin-left: 10px;">已登录</span>' +
-      '<a href="#" onclick="logout()" style="margin-left: 10px;">退出</a>';
+      '<a href="/user/profile" style="color: #333; text-decoration: none; font-weight: 500;">个人中心</a>' +
+      '<a href="/posts/new" style="color: #333; text-decoration: none; font-weight: 500;">写文章</a>' +
+      '<span style="color: #333; font-weight: 500;">已登录</span>' +
+      '<a href="#" onclick="logout()" style="color: #333; text-decoration: none; font-weight: 500;">退出</a>';
+    // 保持间距：因为 auth-links 设置了 gap:18px，自动生效
   }
   window.logout = function() {
     localStorage.removeItem('token');
