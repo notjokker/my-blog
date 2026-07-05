@@ -9,7 +9,10 @@
     <button onclick="deletePost()" class="btn-delete">删除</button>
   </div>
 
-  <div><%- post.content %></div>
+  <!-- 正文：左对齐 + 图片自适应 -->
+  <div style="text-align: left;">
+    <%- post.content %>
+  </div>
   <hr>
 
   <p>
@@ -30,6 +33,9 @@
 <style>
   .btn-edit { padding: 5px 10px; background: #4CAF50; color: white; text-decoration: none; border-radius: 3px; }
   .btn-delete { padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; }
+
+  /* 图片自适应 */
+  img { max-width: 100%; height: auto; }
 </style>
 
 <script>
