@@ -1,13 +1,99 @@
-body
- { font-family: sans-serif; 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #faf8ef;   /* 与2048背景色完全一致 */
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.container {
   max-width: 800px;
-   margin: auto; padding: 20px; background: #f9f9f9; color: #333; }
-nav a, nav span { color: white; text-decoration: none; margin-right: 10px; }
-.post { background: white; padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-#like-btn { background: #f0f0f0; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
-#like-btn:hover { background: #ffe0e0; }
-#comments-list { margin: 10px 0; }
-.comment-item { border-bottom: 1px solid #eee; padding: 8px 0; }
-#comment-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-button { padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-button:hover { background: #0056b3; }
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 导航栏 - 比背景稍深 */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #e8e0d5;
+  color: #333;
+}
+
+.navbar a, .navbar span {
+  color: #333;
+  text-decoration: none;
+  margin-left: 16px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navbar a:hover {
+  color: #000;
+}
+
+.navbar .brand {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-left: 0;
+}
+
+.navbar .nav-links {
+  display: flex;
+  align-items: center;
+}
+
+/* 页脚 */
+.footer {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  border-top: 1px solid #e0d8c8;
+  margin-top: 60px;
+  font-size: 0.9rem;
+}
+
+.footer p {
+  margin: 5px 0;
+}
+
+/* 文章卡片 */
+.post {
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* 通用按钮 */
+button, .btn {
+  background: #8b7b6b;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+button:hover {
+  background: #6b5e52;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 15px;
+}

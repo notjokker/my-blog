@@ -1,23 +1,23 @@
-<nav style="background:#333; color:white; padding:10px; margin-bottom:20px;">
-  <a href="/" style="color:white; text-decoration:none; font-weight:bold;">My Blog</a>
-  <span style="float:right;">
-    <a href="/posts" style="color:white; margin-right:15px;">文章</a>
-    <a href="/games/2048.html" style="color:white; margin-right:15px;">2048</a>
+<nav class="navbar">
+  <a href="/" class="brand">✒️ My Blog</a>
+  <div class="nav-links">
+    <a href="/posts">文章</a>
+    <a href="/games/2048.html">2048</a>
     <span id="auth-links">
-      <a href="/auth/login" style="color:white;">登录</a>
-      <a href="/auth/register" style="color:white; margin-left:10px;">注册</a>
+      <a href="/auth/login">登录</a>
+      <a href="/auth/register">注册</a>
     </span>
-  </span>
+  </div>
 </nav>
 <script>
 (function() {
   var token = localStorage.getItem('token');
   if (token) {
-    document.getElementById('auth-links').innerHTML = '<a href="/posts/new" style="color:white; margin-right:15px;">写文章</a>' +
-      '<span style="color:white; margin-right:15px;">已登录</span>' +
-      '<a href="#" onclick="logout()" style="color:white; margin-left:10px;">退出</a>';
+    document.getElementById('auth-links').innerHTML = 
+      '<a href="/posts/new">写文章</a>' +
+      '<span style="color: #333;">已登录</span>' +
+      '<a href="#" onclick="logout()">退出</a>';
   }
-  // 挂载到全局，因为 onclick 需要
   window.logout = function() {
     localStorage.removeItem('token');
     window.location.href = '/posts';

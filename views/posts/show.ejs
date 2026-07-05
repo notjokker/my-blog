@@ -1,28 +1,31 @@
 <%- include('../partials/header') %>
-<h1><%= post.title %></h1>
-<p><small>作者: <%= post.author?.name || '匿名' %> | 分类: <%= post.category?.name || '未分类' %> | <%= post.createdAt.toDateString() %></small></p>
+<main class="container">
+  <h1><%= post.title %></h1>
+  <p><small>作者: <%= post.author?.name || '匿名' %> | 分类: <%= post.category?.name || '未分类' %> | <%= post.createdAt.toDateString() %></small></p>
 
-<!-- 编辑/删除按钮，仅作者可见 -->
-<div id="post-actions" style="margin-bottom:10px; display:none;">
-  <a href="/posts/edit/<%= post.id %>" class="btn-edit">编辑</a>
-  <button onclick="deletePost()" class="btn-delete">删除</button>
-</div>
+  <!-- 编辑/删除按钮，仅作者可见 -->
+  <div id="post-actions" style="margin-bottom:10px; display:none;">
+    <a href="/posts/edit/<%= post.id %>" class="btn-edit">编辑</a>
+    <button onclick="deletePost()" class="btn-delete">删除</button>
+  </div>
 
-<div><%- post.content %></div>
-<hr>
+  <div><%- post.content %></div>
+  <hr>
 
-<p>
-  <button id="like-btn" data-post-id="<%= post.id %>">❤️ <span id="like-count">0</span></button>
-</p>
+  <p>
+    <button id="like-btn" data-post-id="<%= post.id %>">❤️ <span id="like-count">0</span></button>
+  </p>
 
-<h3>评论</h3>
-<div id="comments-list">加载中...</div>
-<hr>
-<div id="comment-form" style="display:none;">
-  <textarea id="comment-input" placeholder="写下你的评论..." rows="3" style="width:100%"></textarea>
-  <button id="comment-submit">发表评论</button>
-</div>
-<p id="login-prompt">请先 <a href="/auth/login">登录</a> 后发表评论。</p>
+  <h3>评论</h3>
+  <div id="comments-list">加载中...</div>
+  <hr>
+  <div id="comment-form" style="display:none;">
+    <textarea id="comment-input" placeholder="写下你的评论..." rows="3" style="width:100%"></textarea>
+    <button id="comment-submit">发表评论</button>
+  </div>
+  <p id="login-prompt">请先 <a href="/auth/login">登录</a> 后发表评论。</p>
+</main>
+<%- include('../partials/footer') %>
 
 <style>
   .btn-edit { padding: 5px 10px; background: #4CAF50; color: white; text-decoration: none; border-radius: 3px; }
