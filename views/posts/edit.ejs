@@ -37,7 +37,8 @@
   var token = localStorage.getItem('token');
   if (!token) { alert('请先登录'); window.location.href = '/auth/login'; return; }
 
-   document.getElementById('upload-btn').addEventListener('click', async function() {
+  // 图片上传功能
+  document.getElementById('upload-btn').addEventListener('click', async function() {
     var fileInput = document.getElementById('image-file');
     var file = fileInput.files[0];
     if (!file) {
@@ -69,10 +70,12 @@
     }
   });
 
+  // 文章保存（包含 categoryId）
   document.getElementById('post-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     var title = document.getElementById('title').value;
     var content = document.getElementById('content').value;
+    var categoryId = document.getElementById('categoryId').value || null;   // 关键修复
     var url = postId ? '/posts/' + postId : '/posts';
     var method = postId ? 'PUT' : 'POST';
     try {
@@ -82,7 +85,7 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ title: title, content: content })
+        body: JSON.stringify({ title, content, categoryId })   // 包含 categoryId
       });
       if (res.ok) {
         window.location.href = '/posts';
