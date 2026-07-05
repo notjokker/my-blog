@@ -1,4 +1,7 @@
-body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; background: #f9f9f9; color: #333; }
+body
+ { font-family: sans-serif; 
+  max-width: 800px;
+   margin: auto; padding: 20px; background: #f9f9f9; color: #333; }
 nav a, nav span { color: white; text-decoration: none; margin-right: 10px; }
 .post { background: white; padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 #like-btn { background: #f0f0f0; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
