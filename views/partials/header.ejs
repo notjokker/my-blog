@@ -76,10 +76,14 @@
 </head>
 <nav class="navbar">
   <a href="/" class="brand">✒️ My Blog</a>
-  <div>
+  <div style="display: flex; align-items: center;">
     <a href="/posts">文章</a>
     <a href="/games/2048.html">2048</a>
-    <span id="auth-links">
+    <form action="/search" method="GET" style="display: inline-flex; align-items: center; margin-left: 15px;">
+      <input type="text" name="q" placeholder="搜索文章..." style="width: 140px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 5px; font-size: 0.9rem;">
+      <button type="submit" style="padding: 4px 10px; font-size: 0.9rem; background: #8b7b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">搜索</button>
+    </form>
+    <span id="auth-links" style="margin-left: 15px;">
       <a href="/auth/login">登录</a>
       <a href="/auth/register">注册</a>
     </span>
@@ -90,9 +94,10 @@
   var token = localStorage.getItem('token');
   if (token) {
     document.getElementById('auth-links').innerHTML = 
+      '<a href="/user/profile">个人中心</a>' +
       '<a href="/posts/new">写文章</a>' +
-      '<span style="color: #333;">已登录</span>' +
-      '<a href="#" onclick="logout()">退出</a>';
+      '<span style="color: #333; margin-left: 10px;">已登录</span>' +
+      '<a href="#" onclick="logout()" style="margin-left: 10px;">退出</a>';
   }
   window.logout = function() {
     localStorage.removeItem('token');

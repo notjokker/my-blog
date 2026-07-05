@@ -13,6 +13,8 @@ const like_routes_1 = __importDefault(require("./modules/like/like.routes"));
 const comment_routes_1 = __importDefault(require("./modules/comment/comment.routes"));
 const auth_routes_1 = __importDefault(require("./modules/auth/auth.routes"));
 const upload_routes_1 = __importDefault(require("./modules/upload/upload.routes"));
+const user_routes_1 = __importDefault(require("./modules/user/user.routes"));
+const search_routes_1 = __importDefault(require("./modules/search/search.routes"));
 const app = (0, express_1.default)();
 // 设置模板引擎
 app.set('view engine', 'ejs');
@@ -36,5 +38,8 @@ app.use('/api/posts', like_routes_1.default);
 app.use('/api/posts', comment_routes_1.default);
 app.use('/api/auth', auth_routes_1.default);
 app.use('/auth', auth_routes_1.default);
+app.use('/api/user', user_routes_1.default);
+app.use('/user', user_routes_1.default);
+app.use('/search', search_routes_1.default);
 exports.default = app;
 //# sourceMappingURL=app.js.map

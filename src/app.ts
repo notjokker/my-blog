@@ -8,6 +8,8 @@ import likeRoutes from './modules/like/like.routes';
 import commentRoutes from './modules/comment/comment.routes';
 import authRoutes from './modules/auth/auth.routes';
 import uploadRoutes from './modules/upload/upload.routes';
+import userRoutes from './modules/user/user.routes';
+import searchRoutes from './modules/search/search.routes';
 
 const app = express();
 
@@ -37,5 +39,8 @@ app.use('/api/posts', likeRoutes);
 app.use('/api/posts', commentRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/user', userRoutes);
+app.use('/search', searchRoutes);
 
 export default app;

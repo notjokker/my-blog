@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+<main class="container">
+  <h1>搜索结果</h1>
+  <% if (query) { %>
+    <p>搜索 "<strong><%= query %></strong>" 的结果：</p>
+  <% } %>
+  <% if (results.length === 0) { %>
+    <p>没有找到相关文章。</p>
+  <% } else { %>
+    <% results.forEach(post => { %>
+      <div class="post-card">
+        <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+        <div class="meta">
+          ✍️ <%= post.author?.name || '匿名' %>
+          · 🗂️ <%= post.category?.name || '未分类' %>
+          · 📅 <%= post.createdAt.toDateString() %>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</main>
+<%- include('partials/footer') %>
