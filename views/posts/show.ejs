@@ -87,55 +87,40 @@
     loadLikeCount();
   });
 
-  // 评论渲染
-  async function loadComments(){
-    var res = await fetch('/api/posts/'+postId+'/comments');
-    var comments = await res.json();
+  // 评论渲染（递归显示嵌套回复）
+  function renderCommentTree(comments) {
+    if (!comments || comments.length === 0) return '';
     var html = '';
-    // 建立映射
-    var commentMap = {};
-    var topComments = [];
-    comments.forEach(c=>{ commentMap[c.id] = c; c.replies = []; });
-    comments.forEach(c=>{
-      if(c.parentId){
-        var parent = commentMap[c.parentId];
-        if(parent) parent.replies.push(c);
-      } else {
-        topComments.push(c);
+    comments.forEach(function(c) {
+      html += '<div class="comment-item" id="comment-' + c.id + '">';
+      html += '<div style="display:flex; align-items:center;">';
+      html += '<img src="' + (c.user.avatar || '/default-avatar.png') + '" style="width:24px;height:24px;border-radius:50%; margin-right:8px;">';
+      html += '<strong>' + (c.user.name || c.user.email) + '</strong>';
+      html += '<span style="color:#999; font-size:0.8em; margin-left:10px;">' + new Date(c.createdAt).toLocaleString() + '</span>';
+      html += '</div>';
+      html += '<div style="margin:5px 0;">' + c.content.replace(/</g, '&lt;') + '</div>';
+      html += '<div>';
+      html += '<a class="reply-btn" onclick="replyTo(' + c.id + ', \'' + (c.user.name || c.user.email) + '\')">回复</a>';
+      html += '<a class="quote-btn" onclick="quoteComment(' + c.id + ')">引用</a>';
+      html += '</div>';
+      // 递归显示子回复
+      if (c.replies && c.replies.length > 0) {
+        html += '<div style="margin-left:25px;">' + renderCommentTree(c.replies) + '</div>';
       }
+      html += '</div>';
     });
+    return html;
+  }
 
-    function renderComment(c, isReply){
-      var hasReplies = c.replies && c.replies.length > 0;
-      var replyHtml = '';
-      if(hasReplies){
-        replyHtml = '<div style="margin-left:20px;">';
-        c.replies.forEach(r=>{ replyHtml += renderComment(r, true); });
-        replyHtml += '</div>';
-      }
-      return `
-        <div class="comment-item" id="comment-${c.id}">
-          <div style="display:flex; align-items:center;">
-            <img src="${c.user.avatar || '/default-avatar.png'}" style="width:24px;height:24px;border-radius:50%; margin-right:8px;">
-            <strong>${c.user.name || c.user.email}</strong>
-            <span style="color:#999; font-size:0.8em; margin-left:10px;">${new Date(c.createdAt).toLocaleString()}</span>
-          </div>
-          <div style="margin:5px 0;">${c.content.replace(/</g,'&lt;')}</div>
-          <div>
-            <a class="reply-btn" onclick="replyTo(${c.id}, '${c.user.name}')">回复</a>
-            <a class="quote-btn" onclick="quoteComment(${c.id})">引用</a>
-          </div>
-          ${replyHtml}
-        </div>
-      `;
-    }
-
+  async function loadComments() {
+    var res = await fetch('/api/posts/' + postId + '/comments');
+    var comments = await res.json();
     var list = document.getElementById('comments-list');
-    if(topComments.length===0){
+    if (!comments || comments.length === 0) {
       list.innerHTML = '<p>暂无评论，来发表第一条吧！</p>';
-    } else {
-      list.innerHTML = topComments.map(c=>renderComment(c,false)).join('');
+      return;
     }
+    list.innerHTML = renderCommentTree(comments);
   }
 
   // 回复功能
@@ -157,16 +142,27 @@
     fetch('/api/posts/'+postId+'/comments')
       .then(r=>r.json())
       .then(comments=>{
-        var c = comments.find(co=>co.id===commentId);
+        var c = findCommentById(comments, commentId);
         if(!c) return;
-        var quote = `> ${c.content.replace(/\n/g, '\n> ')}\n\n`;
+        var quote = '> ' + c.content.replace(/\n/g, '\n> ') + '\n\n';
         var textarea = document.getElementById('comment-input');
         textarea.value = quote + textarea.value;
         textarea.focus();
       });
   };
 
-  // 划线评论：监听文章选中
+  function findCommentById(comments, id) {
+    for (var i = 0; i < comments.length; i++) {
+      if (comments[i].id === id) return comments[i];
+      if (comments[i].replies) {
+        var found = findCommentById(comments[i].replies, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  // 划线评论
   document.querySelector('.post-content').addEventListener('mouseup', function(e){
     var selection = window.getSelection();
     if(!selection.toString().trim()) return;
