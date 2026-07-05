@@ -54,7 +54,7 @@ router.get('/me/likes', authenticate, async (req: any, res: Response) => {
     include: { post: { select: { id: true, title: true, createdAt: true } } },
     orderBy: { createdAt: 'desc' }
   });
-  res.json(likes.map(l => l.post));
+  res.json(likes.map((l:any)=> l.post));
 });
 
 // 我的评论
@@ -75,7 +75,7 @@ router.get('/me/history', authenticate, async (req: any, res: Response) => {
     orderBy: { createdAt: 'desc' },
     take: 50
   });
-  res.json(history.map(h => h.post));
+  res.json(history.map((h:any)=> h.post));
 });
 
 export default router;

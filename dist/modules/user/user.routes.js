@@ -52,7 +52,7 @@ router.get('/me/likes', auth_1.authenticate, async (req, res) => {
         include: { post: { select: { id: true, title: true, createdAt: true } } },
         orderBy: { createdAt: 'desc' }
     });
-    res.json(likes.map(l => l.post));
+    res.json(likes.map((l) => l.post));
 });
 // 我的评论
 router.get('/me/comments', auth_1.authenticate, async (req, res) => {
@@ -71,7 +71,7 @@ router.get('/me/history', auth_1.authenticate, async (req, res) => {
         orderBy: { createdAt: 'desc' },
         take: 50
     });
-    res.json(history.map(h => h.post));
+    res.json(history.map((h) => h.post));
 });
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map

@@ -34,7 +34,7 @@ router.get('/:postId/comments', async (req, res) => {
         orderBy: { createdAt: 'asc' }
     });
     // 只返回顶级评论（parentId 为 null），replies 字段包含嵌套回复
-    const topComments = comments.filter(c => c.parentId === null);
+    const topComments = comments.filter((c) => c.parentId === null);
     res.json(topComments);
 });
 // 发表评论（需登录，支持 parentId 回复）
