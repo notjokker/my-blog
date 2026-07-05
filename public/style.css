@@ -97,3 +97,8 @@ input, textarea, select {
   font-family: inherit;
   margin-bottom: 15px;
 }
+
+.post-content img {
+  max-width: 100%;
+  height: auto;
+}
