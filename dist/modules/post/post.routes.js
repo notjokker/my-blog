@@ -22,8 +22,9 @@ router.get('/', async (req, res) => {
     res.render('posts/index', { posts, categories, currentCategory: Number(category) || null });
 });
 // 写文章页面（公开）
-router.get('/new', (_req, res) => {
-    res.render('posts/edit', { post: null, categories: [] });
+router.get('/new', async (_req, res) => {
+    const categories = await prisma.category.findMany();
+    res.render('posts/edit', { post: null, categories });
 });
 // 编辑文章页面（公开，权限在API控制）
 router.get('/edit/:id', async (req, res) => {
@@ -36,18 +37,34 @@ router.get('/edit/:id', async (req, res) => {
     const categories = await prisma.category.findMany();
     res.render('posts/edit', { post, categories });
 });
-// 文章详情（公开）
-router.get('/:id', async (req, res) => {
+// 文章详情（公开，支持浏览历史记录）
+router.get('/:id', auth_1.optionalAuth, async (req, res) => {
     const postId = Number(req.params.id);
     if (isNaN(postId) || postId < 1) {
         return res.status(400).send('无效的文章ID');
     }
     const post = await prisma.post.findUnique({
         where: { id: postId },
-        include: { author: true, category: true },
+        include: {
+            author: {
+                select: { id: true, name: true, email: true, avatar: true, bio: true }
+            },
+            category: true,
+        },
     });
     if (!post)
         return res.status(404).send('文章未找到');
+    // 记录浏览历史（仅登录用户）
+    if (req.user) {
+        try {
+            await prisma.readHistory.create({
+                data: { userId: req.user.id, postId }
+            });
+        }
+        catch (err) {
+            // 忽略可能的重复记录错误
+        }
+    }
     const htmlContent = (0, marked_1.marked)(post.content);
     res.render('posts/show', { post: { ...post, content: htmlContent } });
 });

@@ -1,110 +1,133 @@
 <%- include('../partials/header') %>
 <main class="container">
   <h1>个人中心</h1>
-  <div id="profile-content" style="background:white; padding:20px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-    <p>加载中...</p>
+  <div id="profile-section" style="background:white; padding:20px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-bottom:20px;">
+    <p id="profile-loading">加载中...</p>
+  </div>
+
+  <div class="tabs" style="margin-bottom:20px;">
+    <button class="tab-btn active" onclick="switchTab('posts')">我的文章</button>
+    <button class="tab-btn" onclick="switchTab('likes')">点赞文章</button>
+    <button class="tab-btn" onclick="switchTab('comments')">评论历史</button>
+    <button class="tab-btn" onclick="switchTab('history')">浏览历史</button>
+  </div>
+
+  <div id="tab-content" style="background:white; padding:20px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    加载中...
   </div>
 </main>
 <%- include('../partials/footer') %>
+
+<style>
+  .tab-btn { padding: 8px 15px; margin-right: 5px; border: 1px solid #ccc; background: #f9f6f0; cursor: pointer; border-radius: 4px 4px 0 0; }
+  .tab-btn.active { background: #8b7b6b; color: #fff; border-color: #8b7b6b; }
+  .list-item { padding: 8px 0; border-bottom: 1px solid #eee; }
+</style>
 
 <script>
 (function() {
   var token = localStorage.getItem('token');
   if (!token) { window.location.href = '/auth/login'; return; }
 
-  // 获取用户信息并渲染
+  // 加载个人信息
   async function loadProfile() {
     try {
-      var res = await fetch('/api/user/me', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
+      var res = await fetch('/api/user/me', { headers: {'Authorization':'Bearer '+token} });
       if (!res.ok) { window.location.href = '/auth/login'; return; }
       var user = await res.json();
-      renderProfile(user);
-    } catch (e) {
-      alert('加载失败，请重新登录');
-      window.location.href = '/auth/login';
-    }
+      var html = `
+        <p><strong>邮箱：</strong>${user.email}</p>
+        <p><strong>昵称：</strong><span id="display-name">${user.name || '未设置'}</span></p>
+        <p><strong>简介：</strong><span id="display-bio">${user.bio || '未设置'}</span></p>
+        <p><strong>头像：</strong><img src="${user.avatar || '/default-avatar.png'}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;"></p>
+        <hr>
+        <details>
+          <summary>编辑资料</summary>
+          <form id="edit-form" style="margin-top:10px;">
+            <input id="edit-name" value="${user.name||''}" placeholder="昵称"><br><br>
+            <textarea id="edit-bio" rows="2">${user.bio||''}</textarea><br><br>
+            <input id="edit-avatar" value="${user.avatar||''}" placeholder="头像URL">
+            <input type="file" id="avatar-file" accept="image/*">
+            <button type="button" id="upload-avatar-btn">上传头像</button><span id="upload-status"></span><br><br>
+            <button type="submit">保存修改</button>
+          </form>
+        </details>
+      `;
+      document.getElementById('profile-section').innerHTML = html;
+
+      // 绑定上传
+      document.getElementById('upload-avatar-btn').addEventListener('click', async ()=>{
+        var file = document.getElementById('avatar-file').files[0];
+        if(!file) { alert('请选择图片'); return; }
+        var fd = new FormData(); fd.append('image', file);
+        var st = document.getElementById('upload-status'); st.textContent = '上传中...';
+        var r = await fetch('/api/upload', {method:'POST', headers:{'Authorization':'Bearer '+token}, body:fd});
+        if(r.ok){
+          var d = await r.json();
+          document.getElementById('edit-avatar').value = d.url;
+          st.innerHTML = '<span style="color:green;">成功</span>';
+        } else {
+          var e = await r.json();
+          st.innerHTML = '<span style="color:red;">'+ (e.error||'失败') +'</span>';
+        }
+      });
+
+      document.getElementById('edit-form').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        var name = document.getElementById('edit-name').value;
+        var bio = document.getElementById('edit-bio').value;
+        var avatar = document.getElementById('edit-avatar').value;
+        var r = await fetch('/api/user/profile', {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+          body: JSON.stringify({name, bio, avatar})
+        });
+        if(r.ok){
+          alert('更新成功');
+          loadProfile(); // 重新加载显示
+        } else {
+          alert('更新失败');
+        }
+      });
+    } catch(e) { alert('加载失败'); }
   }
 
-  function renderProfile(user) {
-    var html = `
-      <p><strong>邮箱：</strong>${user.email}</p>
-      <p><strong>昵称：</strong><span id="display-name">${user.name || '未设置'}</span></p>
-      <p><strong>简介：</strong><span id="display-bio">${user.bio || '未设置'}</span></p>
-      <p><strong>头像：</strong><img id="preview-avatar" src="${user.avatar || '/default-avatar.png'}" alt="头像" style="width:80px; height:80px; border-radius:50%; object-fit:cover;"></p>
-      <hr>
-      <h3>编辑资料</h3>
-      <form id="profile-form">
-        <label>昵称：</label>
-        <input type="text" id="name" value="${user.name || ''}"><br><br>
-        <label>简介：</label>
-        <textarea id="bio" rows="3">${user.bio || ''}</textarea><br><br>
-        <label>头像URL：</label>
-        <input type="text" id="avatar-url" value="${user.avatar || ''}" placeholder="或上传图片自动填充"><br>
-        <small>也可以上传图片：</small>
-        <input type="file" id="avatar-file" accept="image/*">
-        <button type="button" id="upload-avatar-btn">上传头像</button>
-        <span id="upload-status"></span><br><br>
-        <button type="submit">保存修改</button>
-      </form>
-    `;
-    document.getElementById('profile-content').innerHTML = html;
+  // 切换选项卡
+  window.switchTab = function(tab){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    event.target.classList.add('active');
+    loadTabContent(tab);
+  };
 
-    // 绑定事件
-    document.getElementById('upload-avatar-btn').addEventListener('click', async function() {
-      var fileInput = document.getElementById('avatar-file');
-      var file = fileInput.files[0];
-      if (!file) { alert('请选择头像图片'); return; }
-      var formData = new FormData();
-      formData.append('image', file);
-      var statusEl = document.getElementById('upload-status');
-      statusEl.textContent = '上传中...';
-      try {
-        var res = await fetch('/api/upload', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token },
-          body: formData
-        });
-        if (res.ok) {
-          var data = await res.json();
-          document.getElementById('avatar-url').value = data.url;
-          document.getElementById('preview-avatar').src = data.url;
-          statusEl.innerHTML = '<span style="color:green;">上传成功</span>';
+  async function loadTabContent(tab){
+    var url = '';
+    var title = '';
+    switch(tab){
+      case 'posts': url = '/api/user/me/posts'; title = '我的文章'; break;
+      case 'likes': url = '/api/user/me/likes'; title = '点赞文章'; break;
+      case 'comments': url = '/api/user/me/comments'; title = '评论历史'; break;
+      case 'history': url = '/api/user/me/history'; title = '浏览历史'; break;
+    }
+    var res = await fetch(url, { headers: {'Authorization':'Bearer '+token} });
+    var data = await res.json();
+    var html = `<h3>${title}</h3>`;
+    if(data.length === 0){
+      html += '<p>暂无记录</p>';
+    } else {
+      data.forEach(item => {
+        if(tab==='comments'){
+          html += `<div class="list-item">在 <a href="/posts/${item.post.id}">${item.post.title}</a> 中评论：${item.content.substring(0,50)}...</div>`;
+        } else if(tab==='likes'){
+          html += `<div class="list-item"><a href="/posts/${item.id}">${item.title}</a></div>`;
         } else {
-          var err = await res.json();
-          statusEl.innerHTML = '<span style="color:red;">' + (err.error || '上传失败') + '</span>';
+          html += `<div class="list-item"><a href="/posts/${item.id}">${item.title}</a> - ${new Date(item.createdAt).toLocaleDateString()}</div>`;
         }
-      } catch (e) {
-        statusEl.innerHTML = '<span style="color:red;">网络错误</span>';
-      }
-    });
-
-    document.getElementById('profile-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      var name = document.getElementById('name').value;
-      var bio = document.getElementById('bio').value;
-      var avatar = document.getElementById('avatar-url').value;
-      try {
-        var res = await fetch('/api/user/profile', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({ name, bio, avatar })
-        });
-        if (res.ok) {
-          alert('资料更新成功');
-          document.getElementById('display-name').textContent = name || '未设置';
-          document.getElementById('display-bio').textContent = bio || '未设置';
-        } else {
-          var err = await res.json();
-          alert(err.error || '更新失败');
-        }
-      } catch (e) {
-        alert('网络错误');
-      }
-    });
+      });
+    }
+    document.getElementById('tab-content').innerHTML = html;
   }
 
   loadProfile();
+  loadTabContent('posts');
 })();
 </script>

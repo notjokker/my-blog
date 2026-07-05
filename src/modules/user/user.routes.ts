@@ -37,5 +37,45 @@ router.put('/profile', authenticate, async (req: any, res: Response) => {
 router.get('/profile', (_req: Request, res: Response) => {
   res.render('user/profile');
 });
+// 我的文章列表
+router.get('/me/posts', authenticate, async (req: any, res: Response) => {
+  const posts = await prisma.post.findMany({
+    where: { authorId: req.user.id },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, title: true, createdAt: true }
+  });
+  res.json(posts);
+});
+
+// 我点赞的文章
+router.get('/me/likes', authenticate, async (req: any, res: Response) => {
+  const likes = await prisma.like.findMany({
+    where: { userId: req.user.id },
+    include: { post: { select: { id: true, title: true, createdAt: true } } },
+    orderBy: { createdAt: 'desc' }
+  });
+  res.json(likes.map(l => l.post));
+});
+
+// 我的评论
+router.get('/me/comments', authenticate, async (req: any, res: Response) => {
+  const comments = await prisma.comment.findMany({
+    where: { userId: req.user.id },
+    include: { post: { select: { id: true, title: true } } },
+    orderBy: { createdAt: 'desc' }
+  });
+  res.json(comments);
+});
+
+// 我的浏览历史
+router.get('/me/history', authenticate, async (req: any, res: Response) => {
+  const history = await prisma.readHistory.findMany({
+    where: { userId: req.user.id },
+    include: { post: { select: { id: true, title: true } } },
+    orderBy: { createdAt: 'desc' },
+    take: 50
+  });
+  res.json(history.map(h => h.post));
+});
 
 export default router;
